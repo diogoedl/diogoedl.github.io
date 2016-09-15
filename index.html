@@ -1,23 +1,79 @@
----
-layout: default
----
+<!DOCTYPE html>
+<html>
+    <head>
+         <meta charset="utf-8"> 
+        <title>collatz</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="collatz.css">
+    </head>
+   
+    <body>
+        
+        <div class="container col-sm-8 col-sm-offset-2">
+                <div class="row firstLine col-sm-12">
+                    <div class="col-sm-11">
+                        <div class="row col-sm-12">
+                            <div class="coluna-de-1 col-sm-1">
+                             <label class="collatzTitulo">Collatz</label>
+                            </div>
+                            <div class="col-sm-5">
+                             <p class="collatzSubtitulo">Pares são divididos por 2</p>
+                             <p class="collatzSubtitulo">Ímpares multiplicados por 3 mais 1</p>
+                             <p class="collatzSubtitulo">Até se chegar a 1!</p>
+                            </div>
+                             <form>
+                                 <input class="col-sm-4 respostaCollatz" placeholder="Digite um número para Collatz">
+                             </form>  
+                             
+                        </div>
+                        <div class="row col-sm-12">
+                            <form>
+                                 <input class="col-sm-12 finalInput">
+                            </form>
+                        </div>
+                    </div>  
+                    <div class="col-sm-1">
+                               <button class="ffff" type="button">Collatz</button>
+                    </div>
+                 </div>
+                             
+                            
+        </div> <!-- container button -->
+        
+        <div class="container col-sm-8 col-sm-offset-2">
+                <div class="row firstLine col-sm-12">
+                    <div class="col-sm-11">
+                        <div class="row col-sm-12">
+                            <div class="coluna-de-1 col-sm-1">
+                             <label class="collatzTitulo">Fibonacci</label>
+                            </div>
+                            <div class="col-sm-5">
+                             <p class="collatzSubtitulo">O primeiro número é 0</p>
+                             <p class="collatzSubtitulo">O segundo número é 1</p>
+                             <p class="collatzSubtitulo">O número n é (n-1)+(n-2)</p>
+                            </div>
+                             <form>
+                                 <input class="col-sm-4 respostaFibonacci" placeholder="Digite um n para Fibonacci">
+                             </form>  
+                             
+                        </div>
+                        <div class="row col-sm-12">
+                            <form>
+                                 <input class="col-sm-12 finalFibonacci">
+                            </form>
+                        </div>
+                    </div>  
+                    <div class="col-sm-1">
+                               <button class="fibonacciBotao" type="button">Fibonacci</button>
+                    </div>
+                 </div>
+                             
+                            
+        </div> <!-- container button -->
+        
+        
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>     
+        <script type="text/javascript" src="js.js"></script>
+    </body>
 
-<div class="home">
-
-  <h1 class="page-heading">Posts</h1>
-
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-
-</div>
+</html>
