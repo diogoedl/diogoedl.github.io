@@ -1,0 +1,53 @@
+.container {
+    border: 2px solid purple;
+    margin-top: 18px;
+    padding: 30px;
+}
+
+.ffff, .fibonacciBotao {
+    border-radius: 10px;
+    background-color: #ffff99;
+    border: 2px solid #888888;
+    box-shadow: 5px 5px 5px #888888;
+    margin: 5px;
+    margin-top: 8px;
+    height: 100px;
+    width: 100px;
+    position: relative;
+    right: 20px;
+    
+}
+
+.ffff:hover, .fibonacciBotao:hover {
+    border-radius: 10px;
+    background-color: #f9f991;
+    border: 2px solid #888888;
+}
+
+.ffff:active, .fibonacciBotao:active {
+    transform: translateY(2px) translateX(2px);
+}
+
+.finalInput, .finalFibonacci {
+    border: 1px solid gray;
+    height: 20px;
+    margin: 5px;
+}
+
+.collatzTitulo {
+  font-size: 20px;
+    
+}
+
+.collatzSubtitulo {
+  font-size: 15px;
+}
+
+
+.coluna-de-1 {
+    margin-right: 60px;
+}
+
+.respostaCollatz, .respostaFibonacci {
+    height: 80px;
+}
