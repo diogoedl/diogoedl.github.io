@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<!-- chrome.exe --disable-web-security --user-data-dir-->
+<html>
+
+    <head>
+        <title>Disable Web Security test</title>
+        <script src="https://code.jquery.com/jquery-3.1.1.js" integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA=" crossorigin="anonymous"></script>
+        
+        <script>
+            //$('#sup6').html(creat_parsed);
+            window.onload = function () {
+            $('#loading').hide(); 
+            };
+            function searchPac() {
+                
+                    $('#loading').show();
+                    var int_creat;
+                    var int_sexo;
+                    var int_idade;
+                    var TFG_MDRD;
+                    var TFG_MDRD_negro;
+                    
+                
+                    var form_rgch = document.getElementById('rghc').value;
+                    console.log(form_rgch);
+                
+                
+                    //GET para a primeira tela de login AJAX 1
+                    $.get("http://hcmed.phcnet.usp.br/hcmed/view/login.php", function(data, status) { 
+                    
+                        //fazer login AJAX 2
+                        $.post("http://hcmed.phcnet.usp.br/hcmed/ct_login.php", 
+                                   {
+                                        txt_email: "diogo.e",
+                                        txt_senha: "cultures94"
+                                
+                                    },function(data, status) {
+                             
+                            
+                            
+                            //ir para o painel AJAX 3
+                            $.get("http://hcmed.phcnet.usp.br/hcmed/painel/painel.php", function(data, status) {
+                                    
+                            
+                                //POST para buscar RGHC AJAX 4
+                                $.post("http://hcmed.phcnet.usp.br/hcmed/cli/executa_busca.php", 
+                                           {
+                                                p_ncli: form_rgch,
+                                                form0:"form0"
+                                        
+                                            },function(data, status) {
+                                    
+                                    
+                                    var n_encontrado = data.match(/Busca por/);
+                                    var n_encontrado1 = data.match(/retornou resultado/);
+                                    
+                                    if (n_encontrado != null || n_encontrado1 != null) {   
+                                        $('#sup2').html("RGHC n&atildeo encontrado");
+                                        $('#sup3 td').html(" ");
+                                        $('#sup3').removeClass('appear');
+                                        $('#loading').hide();
+                                    }
+                                    else {
+                                        
+                                        $('#sup3').addClass('appear');
+                                        $('#sup2').html(" ");
+                                    
+                                    
+                                        //ir para página do paciente AJAX 5
+                                        $.get("http://hcmed.phcnet.usp.br/hcmed/cli/entrada.php", function(data, status) {
+                                            
+                                            
+                                            //regex para encontrar sexo no documento "entrada.php"
+                                            var sexo = data.match(/\>([FM])\<\/td/);
+                                            if (sexo[1] == 'F')
+                                                int_sexo = 0.742;
+                                            else if(sexo[1] == 'M')
+                                                int_sexo = 1;
+                                            else
+                                                console.log("Erro na determinação do sexo");
+                                            
+                                            //regex para encontrar idade no documento "entrada.php"
+                                            var idade = data.match(/Idade:[^;]*\>([0-9]*)A\</);
+                                            int_idade = parseInt(idade[1]);
+                                            
+                                            
+                                            
+                                            //procurar exames anteriores AJAX 6
+                                            $.get("http://hcmed.phcnet.usp.br/hcmed/ResultadosExames/Visualizacao/ListarExames.php?campoOrdenacao=data&tipoOrdenacao=desc&dataInicial=15%2F08%2F20&dataFinal=&p_ncli=13803329",
+                                                
+                                                    function(data, status) {
+                                                        //variável para controlar se a creatinina mais recente já foi achada, e para de procurar
+                                                        var achado = 0;
+                                                        
+                                                        //para o arquivo do link do exame
+                                                        var creat_arquivo;
+                                                        
+                                                        //parse data responded from server, to get parsable DOM object
+                                                        var parsed = $.parseHTML(data);
+                                                        //$('#sup6').html(parsed);
+                                                        
+                                                        //go to table and create a list of nodes with the many table rows <tr>
+                                                        var parsedTable = parsed[9].childNodes[6].childNodes[1].childNodes[1].childNodes;
+                                                        
+                                                        $.each(parsedTable, function(key, value) {
+                                                            //check if is really <tr> childNode, not #txt, which has zero childNodes
+                                                            if (value.childElementCount >= 7) {
+                                                                //thisElement will be the td for creatinina in the table
+                                                                var thisElement = value.childNodes[7].childNodes[0].data;
+                                                                
+                                                                if ($.trim(thisElement) == 'CREATININA - SANGUE' && achado < 1) {
+                                                                    var href = value.childNodes[13].childNodes[1].outerHTML;
+                                                                    //extrair link de destino
+                                                                    creat_arquivo = href.match(/(MostrarLaudos.*SIGH)/);
+                                                                    achado++;
+                                                                }
+                                                            }
+                                                            
+                                                        });
+                                                        
+                                                        //verificar se foi encontrada alguma CREATININA
+                                                        if (achado < 1) {
+                                                            $('#sup2').html("Exame de creatinina não encontrado para esse paciente");
+                                                            $('#loading').hide();
+                                                            }
+                                                        else {
+                                                            
+                                                            //criar link para o resultado de creatinina
+                                                             var creat_link = "http://hcmed.phcnet.usp.br/hcmed/ResultadosExames/Visualizacao/" + creat_arquivo[0];
+                                                             
+                                                             //ir para o resultado da creatinina AJAX 7
+                                                             $.get(creat_link, function(data, status) {
+                                                                
+                                                                /* modo antigo de achar creat
+                                                                //encontrar o resultado da creatinina
+                                                                //var creat_parsed = $.parseHTML(data);
+                                                                //var creat_parsedTable = //creat_parsed[19].childNodes[3].childNodes[1].childNodes[4].childNodes[3].innerText;
+                                                                //var creat_sem_unidade = creat_parsedTable.match(/([0-9\,]*)/)[1];
+                                                                console.log(status);
+                                                                */
+                                                                
+                                                                var creat_sem_unidade = data.match(/<td>CREATININA<\/td>.*<b>([^;\s]*)\s*mg\/dL<\/b>/);
+                                                                
+                                                                 
+                                                                creat_ponto = creat_sem_unidade[1].replace(/\,/, '.');
+                                                                int_creat = parseFloat(creat_ponto);
+                                                                
+                                                                //encontrar nome do(a) paciente e data do exame
+                                                                var nome = data.match(/Nome Paciente[^;]*\"\>([^;]*)<\/td>/);
+                                                                var dia_exame = data.match(/Coletado em:[\s]*([^;]*)[\s]*<\/p>/);
+                                                                
+                                                                //calcular TFG 
+                                                                TFG_MDRD = Math.round(int_sexo*186*Math.pow(int_creat,-1.154)*Math.pow(int_idade,-0.203)*10)/10;
+                                                                TFG_MDRD_negro = Math.round(int_sexo*186*Math.pow(int_creat,-1.154)*Math.pow(int_idade,-0.203)*1.21*10)/10;
+                                                                 
+                                                                //determinar a cor do resultado
+                                                                var cor;
+                                                                if (TFG_MDRD >= 40)
+                                                                    cor = 'verde';
+                                                                 else if (TFG_MDRD >= 30)
+                                                                    cor = 'amarelo';
+                                                                 else
+                                                                    cor = 'vermelho';
+                                                                /*
+                                                                console.log("Nome: " + nome[1]);
+                                                                console.log("Idade" + ' ' + int_idade);
+                                                                console.log("Data do exame: " + dia_exame[1]);
+                                                                console.log("Sexo" + ' ' + int_sexo);
+                                                                console.log("Creat" + ' ' + int_creat);
+                                                                console.log(TFG_MDRD);
+                                                                console.log(TFG_MDRD_negro);
+                                                                */
+                                                        
+                                                                 $('#nome').html("Nome: " + nome[1]);
+                                                               if (dia_exame != null)     
+                                                                 $('#dia_exame').html("Coletado em " + dia_exame[1]);
+                                                               else
+                                                                 $('#dia_exame').html("Coletado em " + '?');
+                                                                 
+                                                                 $('#idade').html("Idade: " + int_idade);
+                                                                 $('#sexo').html("Sexo: " + sexo[1]);
+                                                                 $('#creatinina').html("Creatinina: " + int_creat + " mg/dl");
+                                                                 $('#mdrd').html("TFG (MDRD):");
+                                                                 $('#mdrd_outros').html("&nbsp&nbsp&nbsp N&atildeo negros: " + TFG_MDRD + " ml/min/1.73 m2");
+                                                                 $('#mdrd_negro').html("&nbsp&nbsp&nbsp Negros: " + TFG_MDRD_negro + " ml/min/1.73 m2");
+                                                                 
+                                                                 $('.mdrdCor').addClass(cor);
+                                                                 $('#loading').hide();
+
+                                                            }); // FIM AJAX 7
+                                                
+                                                        } // fim do 'else', se encontrada CREATININA
+                                                
+                                            });
+                                            
+                                        }); // FIM AJAX 5
+                                        
+                                    } //fim do else, se encontrado paciente
+                                    
+                                }); //FIM AJAX4
+                                    
+                            }); //FIM AJAX 3
+                            
+                        }); //FIM AJAX 2
+                    
+                    }); //FIM AJAX 1
+            
+            
+            } //fim da definição da função search
+            
+
+        </script>
+        
+        <style>
+            #btn {
+                display: inline-block;
+                padding: 5px;
+                cursor: pointer;
+                text-align: center;
+                text-decoration: none;
+                outline: none;
+                color: #fff;
+                background-color: #4CAF50;
+                border: none;
+                border-radius: 3px;
+                box-shadow: 0 2px #999;
+            }
+            
+            #btn:active {
+                background-color: #3e8e41;
+                box-shadow: 4px 4px #666;
+                transform: translateY(1px);
+            }
+            
+            #rghc {
+                border-width: 1px;
+                border-color: #aaaaaa;
+                padding: 5px;
+                box-shadow: -1px 1px #cccccc;
+            }
+            
+            .appear {
+                border:1px solid #aaaaaa;
+            }
+            
+            #sup1 td {
+                padding-left: 10px;
+            }
+            
+            .verde {
+                color: green;
+            }
+            
+            .amarelo {
+                color: #A86D08;
+            }
+            
+            .vermelho {
+                color: #C00D00;
+            }
+        
+        </style>
+        
+    </head>
+    
+    <body>
+    
+        <div id="sup1" style="margin: 20px; background-color: #eeeeee; border-radius: 4px;">
+            <table>
+                <form action="#" onsubmit="searchPac()"><tr>
+                    <td style="text-align: right;">Procurar paciente:</td>
+                    <td><input type="text" placeholder="RGHC" id="rghc"></td>
+                    <td><input type="submit" id="btn" value="Buscar"></td>
+                </tr></form>
+                
+            </table>
+        </div>
+        
+        <div id="sup2" style="margin: 20px; color: red;"></div>
+        
+        <div style="left: 30 px;" id="loading"> <img src="ajax-loader.gif"> <p id="loading_text"></p> </div>
+        <div id="sup3" style="margin: 20px;">
+        
+        
+            <table style="padding: 10px;">
+                <tr>
+                    <td id="nome"></td>
+                </tr>
+                
+                <tr>
+                    <td id="idade"></td>
+                </tr>
+                
+                <tr>
+                    <td id="sexo"></td>
+                </tr>
+                
+                <tr>
+                    <td id="creatinina" style="padding-top: 20px;"></td>
+                </tr>
+                
+                <tr>
+                    <td id="mdrd">
+                </tr>
+                
+                
+                <tr>
+                    <td id="mdrd_outros" class="mdrdCor" style="text-align: right; font-weight: bold;"></td>
+                </tr>       
+                <tr>
+                    <td id="mdrd_negro" class="mdrdCor" style="text-align: right; font-weight: bold;"></td>
+                </tr>
+                
+                <tr>
+                    <td id="dia_exame" style="padding-top: 20px;"></td>
+                </tr>
+                
+            </table>
+        
+        </div>
+        
+        <div id="sup4"></div>
+        
+        <div id="sup5"></div>
+        
+        <div id="sup6" style="height: 700px; overflow: auto;"></div>
+    
+    </body>
+
+
+</html>
